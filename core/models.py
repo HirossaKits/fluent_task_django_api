@@ -1,6 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
+from django.db.models.deletion import CASCADE
+from django.utils import timezone
+
+# アバター画僧のアップロードパス
+def upload_avatar_path(instance, filename):
+    ext = filename.split('.')[-1]
+    return '/'.join(['avatars',str(instance.user_profile.id)+ str(".")+ str(ext)])
 
 # カスタムユーザーマネージャー
 class UserManager(BaseUserManager):
@@ -38,6 +45,8 @@ class User(AbstractBaseUser,PermissionsMixin):
     # 管理サイトへのアクセス許可
     is_staff = models.BooleanField(default=False)
 
+    created_at = models.DateTimeField(default=timezone.datetime.now)
+
     objects = UserManager()
 
     # emailをユーザー名として使用
@@ -46,4 +55,17 @@ class User(AbstractBaseUser,PermissionsMixin):
     def __str__(self):
         return self.email
 
-# 
+
+class Profile(models.Model):
+    user_email = models.OneToOneField(
+        settings.AUTH_USER_MODEL, related_name='user_email',
+        on_delete=models.CASCADE
+    )
+    first_name = models.CharField(default='',max_length=50)
+    last_name = models.CharField(default='',max_length=50)
+
+    avatar_img = models.ImageField(blank=True,null=True,upload_to=upload_avatar_path)
+
+    def __str__(self):
+        return self.user_profile.username
+
