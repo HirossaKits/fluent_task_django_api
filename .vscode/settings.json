@@ -1,7 +1,7 @@
 {
   "python.pythonPath": "${env:HOMEPATH}\\anaconda3\\envs\\drf_task\\python.exe",
   "python.formatting.provider": "autopep8",   // 自動整形に autopep8 を使う
-  "python.formatting.autopep8Args": [         // autopep8 の設定
+  "python.formatting.autopep8Args": [
     "--indent-size=2",
     "--ignore=E111, E114, E402, E501"
   ],
