@@ -47,10 +47,9 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+  id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
   email = models.EmailField(max_length=50, unique=True)
-  # ユーザーがアクティブかどうか
   is_active = models.BooleanField(default=True)
-  # 管理サイトへのアクセス許可
   is_staff = models.BooleanField(default=False)
   created_at = models.DateTimeField(auto_now_add=True)
 
@@ -66,7 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Profile(models.Model):
   user = models.OneToOneField(
       settings.AUTH_USER_MODEL,
-      related_name='user',
+      related_name='profile_user',
       on_delete=models.CASCADE
   )
   first_name = models.CharField(max_length=50)
@@ -81,7 +80,7 @@ class Profile(models.Model):
 class Project(models.Model):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
   resp_user = models.IntegerField(null=False, blank=False)
-  name = models.CharField(blank=False, max_length=50)
+  name = models.CharField(max_length=50, null=False, blank=False, )
   description = models.CharField(null=True, blank=True, max_length=250)
   start_date = models.DateTimeField(null=True)
   end_date = models.DateTimeField(null=True)
@@ -90,15 +89,15 @@ class Project(models.Model):
     return self.name
 
 
-class UserProjectRelation(models.model):
+class UserProjectRelation(models.Model):
   user = models.ForeignKey(
       settings.AUTH_USER_MODEL,
-      related_name='user',
+      related_name='relation_user',
       on_delete=models.CASCADE
   )
   project = models.ForeignKey(
       Project,
-      related_name='project',
+      related_name='relation_project',
       on_delete=models.CASCADE
   )
 
@@ -120,7 +119,7 @@ class Task(models.Model):
   )
   assigned = models.IntegerField(null=False, blank=False)
   author = models.IntegerField(null=False, blank=False)
-  name = models.CharField(null=False, blank=False, max_length=50)
+  name = models.CharField(max_length=50, null=False, blank=False)
   category = models.IntegerField(null=False, blank=False)
   description = models.CharField(max_length=250)
   status = models.CharField(max_length=20, choices=STATUS, default='0')
@@ -138,17 +137,26 @@ class Task(models.Model):
 class TaskCategory(models.Model):
   project = models.ForeignKey(
       Project,
-      related_name='project',
+      related_name='task_project',
       on_delete=models.CASCADE
   )
-  name = models.CharField(null=False, blank=False)
+  name = models.CharField(max_length=50, null=False, blank=False)
 
 
 class AlterResponsible(models.Model):
   project = models.ForeignKey(
       Project,
-      related_name='project',
+      related_name='alter_project',
       on_delete=models.CASCADE
   )
   alter_from = models.IntegerField(null=False, blank=False)
   alter_to = models.IntegerField(null=False, blank=False)
+
+
+class JoinApproval(models.Model):
+  project = models.ForeignKey(
+      Project,
+      related_name='apploval_project',
+      on_delete=models.CASCADE
+  )
+  user = models.IntegerField(null=False, blank=False)
