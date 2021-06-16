@@ -32,7 +32,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 class ProjectAdmin(admin.ModelAdmin):
-  filter_horizontal = ('member', 'email',)
+  filter_horizontal = ('member',)
 
 
 admin.site.register(models.User, UserAdmin)
