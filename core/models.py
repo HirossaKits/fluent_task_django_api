@@ -6,14 +6,10 @@ from django.core.validators import MinValueValidator
 import uuid
 from django.utils import timezone
 
-# アバター画僧のアップロードパス
-
 
 def upload_avatar_path(instance, filename):
   ext = filename.split('.')[-1]
   return '/'.join(['avatars', str(instance.user_profile.id) + str(".") + str(ext)])
-
-# カスタムユーザーマネージャー
 
 
 class UserManager(BaseUserManager):
@@ -43,8 +39,6 @@ class UserManager(BaseUserManager):
 
     return user
 
-# カスタムユーザー
-
 
 class User(AbstractBaseUser, PermissionsMixin):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
@@ -70,7 +64,6 @@ class Profile(models.Model):
   )
   first_name = models.CharField(max_length=50)
   last_name = models.CharField(max_length=50)
-
   avatar_img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
 
   def __str__(self):
@@ -79,7 +72,8 @@ class Profile(models.Model):
 
 class Project(models.Model):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-  resp_user = models.IntegerField(null=False, blank=False)
+  member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member')
+  resp_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='resp_user', on_delete=models.CASCADE)
   name = models.CharField(max_length=50, null=False, blank=False, )
   description = models.CharField(null=True, blank=True, max_length=250)
   start_date = models.DateTimeField(null=True)
@@ -87,22 +81,6 @@ class Project(models.Model):
 
   def __str__(self):
     return self.name
-
-
-class UserProjectRelation(models.Model):
-  user = models.ForeignKey(
-      settings.AUTH_USER_MODEL,
-      related_name='relation_user',
-      on_delete=models.CASCADE
-  )
-  project = models.ForeignKey(
-      Project,
-      related_name='relation_project',
-      on_delete=models.CASCADE
-  )
-
-  def __str__(self):
-    return f'{self.project.name}_{self.user.first_name} {self.user.last_name}'
 
 
 class Task(models.Model):
@@ -114,11 +92,11 @@ class Task(models.Model):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
   project = models.ForeignKey(
       Project,
-      related_name='user_project',
+      related_name='task_project',
       on_delete=models.CASCADE
   )
-  assigned = models.IntegerField(null=False, blank=False)
-  author = models.IntegerField(null=False, blank=False)
+  assigned = models.ForeignKey(User, related_name='assigned', on_delete=models.SET_NULL, null=True)
+  author = models.ForeignKey(User, related_name='author', on_delete=models.SET_NULL, null=True)
   name = models.CharField(max_length=50, null=False, blank=False)
   category = models.IntegerField(null=False, blank=False)
   description = models.CharField(max_length=250)
@@ -137,7 +115,7 @@ class Task(models.Model):
 class TaskCategory(models.Model):
   project = models.ForeignKey(
       Project,
-      related_name='task_project',
+      related_name='category_project',
       on_delete=models.CASCADE
   )
   name = models.CharField(max_length=50, null=False, blank=False)
@@ -159,4 +137,4 @@ class JoinApproval(models.Model):
       related_name='apploval_project',
       on_delete=models.CASCADE
   )
-  user = models.IntegerField(null=False, blank=False)
+  invited_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, blank=False, on_delete=models.CASCADE)
