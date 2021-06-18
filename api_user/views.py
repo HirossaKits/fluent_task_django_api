@@ -1,7 +1,13 @@
 from django.shortcuts import render
+from rest_framework import status, permissions, generics, viewsets
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
 
-from rest_framework import generics
-from api_user import serializers
 
 class CreateUserView(generics.CreateAPIView):
-    serializer_class = serializers.UserSerializer
+  serializer_class = UserSerializer
+  permission_classes = (permissions.AllowAny)
+
+
+class ListUsrView(generics.ListAPIView):
+  queryset = User.objects.all()
