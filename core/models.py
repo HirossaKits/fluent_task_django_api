@@ -72,9 +72,9 @@ class Profile(models.Model):
 
 class Project(models.Model):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-  name = models.CharField(max_length=50, null=False, blank=False, )
   resp_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='resp_user', on_delete=models.CASCADE)
   member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member')
+  name = models.CharField(max_length=50, null=False, blank=False, )
   description = models.CharField(null=True, blank=True, max_length=250)
   start_date = models.DateTimeField(null=True)
   end_date = models.DateTimeField(null=True)
