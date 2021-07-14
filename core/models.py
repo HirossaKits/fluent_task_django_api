@@ -43,6 +43,8 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
   email = models.EmailField(max_length=50, unique=True)
+  first_name = models.CharField(max_length=50)
+  last_name = models.CharField(max_length=50)
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
   created_at = models.DateTimeField(auto_now_add=True)
@@ -62,8 +64,7 @@ class Profile(models.Model):
       related_name='profile_user',
       on_delete=models.CASCADE
   )
-  first_name = models.CharField(max_length=50)
-  last_name = models.CharField(max_length=50)
+
   avatar_img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
 
   def __str__(self):
