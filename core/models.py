@@ -70,6 +70,20 @@ class Profile(models.Model):
   def __str__(self):
     return self.user.email
 
+class PersonalSettings(models.Model):
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name='settings_user',
+        on_delete=models.CASCADE
+    )
+    dark_mode = models.BooleanField(default=False)
+    view_only_owned = models.BooleanField(default=False)
+    selected_project = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.user.email
+
 
 class Project(models.Model):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
@@ -98,14 +112,16 @@ class Task(models.Model):
   )
   assigned = models.ForeignKey(User, related_name='assigned', on_delete=models.SET_NULL, null=True)
   author = models.ForeignKey(User, related_name='author', on_delete=models.SET_NULL, null=True)
-  name = models.CharField(max_length=50, null=False, blank=False)
+  title = models.CharField(max_length=50, null=False, blank=False)
   category = models.IntegerField(null=False, blank=False)
   description = models.CharField(max_length=250)
   status = models.CharField(max_length=20, choices=STATUS, default='0')
   estimate_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
   actual_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
-  start_date = models.DateField(null=True)
-  end_date = models.DateField(null=True)
+  scheduled_start_date = models.DateField(null=True)
+  scheduled_end_date = models.DateField(null=True)
+  actual_start_date = models.DateField(null=True)
+  actual_end_date = models.DateField(null=True)
   created_at = models.DateTimeField(auto_now_add=True)
   update_at = models.DateTimeField(auto_now=True)
 

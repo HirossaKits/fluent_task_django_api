@@ -1,4 +1,4 @@
-from core.models import Profile, Project, Task
+from core.models import Profile, Project, Task, PersonalSettings
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
@@ -19,8 +19,13 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
   class Meta:
     model = Profile
-    fields = ['id', 'user', 'first_name', 'last_name', 'avatar_img']
+    fields = ['id', 'user', 'avatar_img']
     extra_kwargs = {'user': {'read_only': True}}
+
+class PersonalSettingsSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = PersonalSettings
+    fields = ['dark_mode','view_only_owned','selected_project']
 
 
 class ProjectSerializer(serializers.ModelSerializer):
