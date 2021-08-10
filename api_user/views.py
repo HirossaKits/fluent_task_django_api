@@ -38,6 +38,11 @@ class ProfileViewSet(viewsets.ModelViewSet):
     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PersonalSettingsViewSet(viewsets.ModelViewSet):
+  queryset = Profile.object.all()
+  serializers_class = ProfileSerializer
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
   queryset = Project.objects.all()
   serializer_class = ProjectSerializer
