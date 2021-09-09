@@ -1,5 +1,5 @@
 from django.db.models import query
-from core.models import Profile, Project, Task, TaskCategory
+from core.models import User, Profile, PersonalSettings, Project,Task, TaskCategory
 from rest_framework import status, permissions, generics, viewsets
 from rest_framework.response import Response
 from .serializers import ProjectSerializer, TaskSerializer, UserSerializer, ProfileSerializer
@@ -13,13 +13,16 @@ class CreateUserView(generics.CreateAPIView):
 
 class LoginUserView(generics.RetrieveAPIView):
   serializer_class = UserSerializer
+  permission_classes = (permissions.IsAuthenticated,)
 
   def get_object(self):
     return self.request.user
 
 
 class UpdateUserView(generics.UpdateAPIView):
+  queryset = User.objects.all()
   serializer_class = UserSerializer
+  permission_classes = (permissions.IsAuthenticated,)
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -39,7 +42,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class PersonalSettingsViewSet(viewsets.ModelViewSet):
-  queryset = Profile.object.all()
+  queryset = PersonalSettings.objects.all()
   serializers_class = ProfileSerializer
 
 

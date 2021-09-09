@@ -9,7 +9,7 @@ from django.utils import timezone
 
 def upload_avatar_path(instance, filename):
   ext = filename.split('.')[-1]
-  return '/'.join(['avatars', str(instance.user_profile.id) + str(".") + str(ext)])
+  return '/'.join(['avatars', str(instance.user.id) + str(".") + str(ext)])
 
 
 class UserManager(BaseUserManager):
@@ -48,6 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
   is_active = models.BooleanField(default=True)
   is_staff = models.BooleanField(default=False)
   created_at = models.DateTimeField(auto_now_add=True)
+  update_at = models.DateTimeField(auto_now=True)
 
   objects = UserManager()
 
@@ -64,8 +65,8 @@ class Profile(models.Model):
       related_name='profile_user',
       on_delete=models.CASCADE
   )
-
   avatar_img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
+  desctiption = models.CharField(null=True, blank=True, max_length=250)
 
   def __str__(self):
     return self.user.email
@@ -110,18 +111,19 @@ class Task(models.Model):
       related_name='task_project',
       on_delete=models.CASCADE
   )
+  name = models.CharField(max_length=50, null=False, blank=False)
   assigned = models.ForeignKey(User, related_name='assigned', on_delete=models.SET_NULL, null=True)
   author = models.ForeignKey(User, related_name='author', on_delete=models.SET_NULL, null=True)
-  title = models.CharField(max_length=50, null=False, blank=False)
   category = models.IntegerField(null=False, blank=False)
-  description = models.CharField(max_length=250)
+  note = models.CharField(max_length=250)
   status = models.CharField(max_length=20, choices=STATUS, default='0')
   estimate_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
   actual_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
-  scheduled_start_date = models.DateField(null=True)
-  scheduled_end_date = models.DateField(null=True)
-  actual_start_date = models.DateField(null=True)
-  actual_end_date = models.DateField(null=True)
+  scheduled_startdate = models.DateField(null=True)
+  scheduled_enddate = models.DateField(null=True)
+  actual_startdate = models.DateField(null=True)
+  actual_enddate = models.DateField(null=True)
+  description = models.CharField()
   created_at = models.DateTimeField(auto_now_add=True)
   update_at = models.DateTimeField(auto_now=True)
 

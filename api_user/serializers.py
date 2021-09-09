@@ -19,8 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
   class Meta:
     model = Profile
-    fields = ['id', 'user', 'avatar_img']
-    extra_kwargs = {'user': {'read_only': True}}
+    fields = ['avatar_img','desctiption']
+    # extra_kwargs = {'user': {'read_only': True}}
 
 class PersonalSettingsSerializer(serializers.ModelSerializer):
   class Meta:
