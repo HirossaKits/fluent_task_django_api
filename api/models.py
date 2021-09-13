@@ -121,9 +121,9 @@ class Task(models.Model):
       on_delete=models.CASCADE
   )
   name = models.CharField(max_length=50, null=False, blank=False)
-  assigned_id = models.ForeignKey(User, related_name='assigned_id', on_delete=models.SET_NULL, null=True)
-  author_id = models.ForeignKey(User, related_name='author_id', on_delete=models.SET_NULL, null=True)
-  category = models.ForeignKey(TaskCategory, related_name='category_id', on_delete=models.SET_NULL, null=True)
+  assigned = models.ForeignKey(User, related_name='assigned', on_delete=models.SET_NULL, null=True)
+  author = models.ForeignKey(User, related_name='author', on_delete=models.SET_NULL, null=True)
+  category = models.ForeignKey(TaskCategory, related_name='category', on_delete=models.SET_NULL, null=True)
   status = models.CharField(max_length=20, choices=STATUS, default='0')
   estimate_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
   actual_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
