@@ -92,11 +92,20 @@ class Project(models.Model):
   member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member')
   name = models.CharField(max_length=50, null=False, blank=False, )
   description = models.CharField(null=True, blank=True, max_length=250)
-  start_date = models.DateTimeField(null=True)
-  end_date = models.DateTimeField(null=True)
+  start_date = models.DateField(null=True)
+  end_date = models.DateField(null=True)
 
   def __str__(self):
     return self.name
+
+
+class TaskCategory(models.Model):
+  project = models.ForeignKey(
+      Project,
+      related_name='category_project',
+      on_delete=models.CASCADE
+  )
+  name = models.CharField(max_length=50, null=False, blank=False)
 
 
 class Task(models.Model):
@@ -112,33 +121,22 @@ class Task(models.Model):
       on_delete=models.CASCADE
   )
   name = models.CharField(max_length=50, null=False, blank=False)
-  assigned = models.ForeignKey(User, related_name='assigned', on_delete=models.SET_NULL, null=True)
-  author = models.ForeignKey(User, related_name='author', on_delete=models.SET_NULL, null=True)
-  category = models.IntegerField(null=False, blank=False)
-  note = models.CharField(max_length=250)
+  assigned_id = models.ForeignKey(User, related_name='assigned_id', on_delete=models.SET_NULL, null=True)
+  author_id = models.ForeignKey(User, related_name='author_id', on_delete=models.SET_NULL, null=True)
+  category = models.ForeignKey(TaskCategory, related_name='category_id', on_delete=models.SET_NULL, null=True)
   status = models.CharField(max_length=20, choices=STATUS, default='0')
   estimate_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
   actual_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
-  scheduled_startdate = models.DateField(null=True)
-  scheduled_enddate = models.DateField(null=True)
-  actual_startdate = models.DateField(null=True)
-  actual_enddate = models.DateField(null=True)
-  description = models.CharField()
+  scheduled_startdate = models.DateField(null=True, blank=True)
+  scheduled_enddate = models.DateField(null=True, blank=True)
+  actual_startdate = models.DateField(null=True, blank=True)
+  actual_enddate = models.DateField(null=True, blank=True)
+  description = models.CharField(max_length=250, null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
   update_at = models.DateTimeField(auto_now=True)
 
   def __str__(self):
     return self.name
-
-
-class TaskCategory(models.Model):
-  project = models.ForeignKey(
-      Project,
-      related_name='category_project',
-      on_delete=models.CASCADE
-  )
-  name = models.CharField(max_length=50, null=False, blank=False)
-
 
 class AlterResponsible(models.Model):
   project = models.ForeignKey(

@@ -1,9 +1,8 @@
 from django.db.models import query
-from core.models import User, Profile, PersonalSettings, Project,Task, TaskCategory
+from api.models import User, Profile, PersonalSettings, Project,Task, TaskCategory
 from rest_framework import status, permissions, generics, viewsets
 from rest_framework.response import Response
 from .serializers import ProjectSerializer, TaskSerializer, UserSerializer, ProfileSerializer
-from api_user import serializers
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -65,3 +64,6 @@ class TaskViewSet(viewsets.ModelViewSet):
 # class TaskCategoryViewSet(viewsets.ModelViewSet):
 #   queryset = TaskCategory.objects.all()
 #   serializer_class = TaskCategory
+from django.shortcuts import render
+
+# Create your views here.

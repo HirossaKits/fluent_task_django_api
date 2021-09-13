@@ -1,4 +1,4 @@
-from core.models import Profile, Project, Task, PersonalSettings
+from api.models import Profile, Project, Task, PersonalSettings
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
@@ -35,7 +35,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+
   class Meta:
     model = Task
-    fields = ['id', 'project', 'assigned', 'author', 'name', 'description', 'status',
-              'estimate_manhour', 'actual_manhour', 'start_date', 'end_date', 'created_at', 'update_at']
+    fields = '__all__'

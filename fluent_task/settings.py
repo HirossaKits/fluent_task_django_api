@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     # Add Apps
     'rest_framework',
     'rest_framework.authtoken',
-    'core.apps.CoreConfig',
+    'api.apps.ApiConfig',
     'corsheaders',
     'djoser',
 ]
@@ -148,7 +148,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 # Add Auth user model
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'api.User'
 
 STATIC_URL = '/static/'
 
