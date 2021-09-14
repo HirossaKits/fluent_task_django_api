@@ -2,7 +2,7 @@ from django.db.models import query
 from api.models import User, Profile, PersonalSettings, Project,Task, TaskCategory
 from rest_framework import status, permissions, generics, viewsets
 from rest_framework.response import Response
-from .serializers import ProjectSerializer, TaskSerializer, UserSerializer, ProfileSerializer
+from .serializers import UserSerializer, ProfileSerializer, ProjectSerializer, CategorySerializer, TaskSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -52,6 +52,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
   # def perform_create(self, serializer):
   #   serializer.save(resp_user=self.request.user, member=self.request.user)
 
+# class CategoryViewSet(viewsets.ModelViewSet):
+#   queryset = TaskCategory.project.all()
+#   serializer_class = CategorySerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
   queryset = Task.objects.all()

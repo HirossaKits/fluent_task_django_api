@@ -92,8 +92,6 @@ class Project(models.Model):
   member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member')
   name = models.CharField(max_length=50, null=False, blank=False, )
   description = models.CharField(null=True, blank=True, max_length=250)
-  start_date = models.DateField(null=True)
-  end_date = models.DateField(null=True)
 
   def __str__(self):
     return self.name
@@ -125,13 +123,13 @@ class Task(models.Model):
   author = models.ForeignKey(User, related_name='author', on_delete=models.SET_NULL, null=True)
   category = models.ForeignKey(TaskCategory, related_name='category', on_delete=models.SET_NULL, null=True)
   status = models.CharField(max_length=20, choices=STATUS, default='0')
+  description = models.CharField(max_length=250, null=True, blank=True)
   estimate_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
   actual_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
   scheduled_startdate = models.DateField(null=True, blank=True)
   scheduled_enddate = models.DateField(null=True, blank=True)
   actual_startdate = models.DateField(null=True, blank=True)
   actual_enddate = models.DateField(null=True, blank=True)
-  description = models.CharField(max_length=250, null=True, blank=True)
   created_at = models.DateTimeField(auto_now_add=True)
   update_at = models.DateTimeField(auto_now=True)
 
