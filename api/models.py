@@ -100,10 +100,13 @@ class Project(models.Model):
 class TaskCategory(models.Model):
   project = models.ForeignKey(
       Project,
-      related_name='category_project',
+      related_name='project_category',
       on_delete=models.CASCADE
   )
   name = models.CharField(max_length=50, null=False, blank=False)
+
+  def __str__(self):
+      return self.name
 
 
 class Task(models.Model):
@@ -115,17 +118,17 @@ class Task(models.Model):
   id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
   project = models.ForeignKey(
       Project,
-      related_name='task_project',
+      related_name='project_task',
       on_delete=models.CASCADE
   )
   name = models.CharField(max_length=50, null=False, blank=False)
-  assigned = models.ForeignKey(User, related_name='assigned', on_delete=models.SET_NULL, null=True)
-  author = models.ForeignKey(User, related_name='author', on_delete=models.SET_NULL, null=True)
-  category = models.ForeignKey(TaskCategory, related_name='category', on_delete=models.SET_NULL, null=True)
+  assigned = models.ForeignKey(User, related_name='assigned_task', on_delete=models.SET_NULL, null=True)
+  author = models.ForeignKey(User, related_name='author_task', on_delete=models.SET_NULL, null=True)
+  category = models.ForeignKey(TaskCategory, related_name='category_task', on_delete=models.SET_NULL, null=True, blank=True)
   status = models.CharField(max_length=20, choices=STATUS, default='0')
   description = models.CharField(max_length=250, null=True, blank=True)
-  estimate_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
-  actual_manhour = models.IntegerField(null=True, validators=[MinValueValidator(0)])
+  estimate_manhour = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
+  actual_manhour = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
   scheduled_startdate = models.DateField(null=True, blank=True)
   scheduled_enddate = models.DateField(null=True, blank=True)
   actual_startdate = models.DateField(null=True, blank=True)
