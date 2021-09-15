@@ -39,15 +39,26 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-  category_id = serializers.CharField(source='id')
-  project_id = serializers.CharField(source='project')
-  category_name = serializers.CharField(source='name')
+  # category_id = serializers.CharField(source='id', read_only=True)
+  # project_id = serializers.CharField(source='project')
+  # category_name = serializers.CharField(source='name')
 
   class Meta:
     model = TaskCategory
-    fields = ['category_id',
-              'project_id',
-              'category_name']
+    # fields = ['category_id',
+    #           'project_id',
+    #           'category_name']
+    fields = ['project',
+              'name']
+
+  def create(self, validated_data):
+    print(validated_data)
+    # validated_data['project_id'] = validated_data.get('project', None)
+    # del validated_data['project']
+    # validated_data['api_name'] = validated_data.get('name', None)
+    # del validated_data['name']
+    # print(validated_data)
+    return TaskCategory.objects.create(**validated_data)
 
 
 class TaskSerializer(serializers.ModelSerializer):
