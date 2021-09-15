@@ -52,9 +52,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
   # def perform_create(self, serializer):
   #   serializer.save(resp_user=self.request.user, member=self.request.user)
 
-# class CategoryViewSet(viewsets.ModelViewSet):
-#   queryset = TaskCategory.project.all()
-#   serializer_class = CategorySerializer
+class CategoryViewSet(viewsets.ModelViewSet):
+  queryset = TaskCategory.objects.all()
+  serializer_class = CategorySerializer
 
 class TaskViewSet(viewsets.ModelViewSet):
   queryset = Task.objects.all()

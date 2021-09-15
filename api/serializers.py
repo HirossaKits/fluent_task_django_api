@@ -31,7 +31,11 @@ class PersonalSettingsSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
   class Meta:
     model = Project
-    fields = ['id', 'resp_user', 'member', 'name', 'description', 'start_date', 'end_date']
+    fields = ['id',
+              'resp_user',
+              'member',
+              'name',
+              'description']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -44,6 +48,7 @@ class CategorySerializer(serializers.ModelSerializer):
     fields = ['category_id',
               'project_id',
               'category_name']
+
 
 class TaskSerializer(serializers.ModelSerializer):
   task_id = serializers.CharField(source='id')
@@ -65,3 +70,7 @@ class TaskSerializer(serializers.ModelSerializer):
               'actual_enddate',
               'created_at',
               'update_at']
+
+    read_only_fields = ['task_id',
+              'project_id',
+              'category_id',]
