@@ -28,48 +28,32 @@ class PersonalSettingsSerializer(serializers.ModelSerializer):
     fields = ['dark_mode','view_only_owned','selected_project']
 
 
-class ProjectSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = Project
-    fields = ['id',
-              'resp_user',
-              'member',
-              'name',
-              'description']
-
-
 class CategorySerializer(serializers.ModelSerializer):
-  # category_id = serializers.CharField(source='id', read_only=True)
-  # project_id = serializers.CharField(source='project')
-  # category_name = serializers.CharField(source='name')
+  project_id = serializers.CharField(read_only=True)
+  category_id = serializers.CharField(source='id', read_only=True)
+  category_name = serializers.CharField(source='name')
 
   class Meta:
     model = TaskCategory
-    # fields = ['category_id',
-    #           'project_id',
-    #           'category_name']
-    fields = ['project',
-              'name']
+    fields = ['project_id',
+              'category_id',
+              'category_name']
 
   def create(self, validated_data):
-    print(validated_data)
-    # validated_data['project_id'] = validated_data.get('project', None)
-    # del validated_data['project']
-    # validated_data['api_name'] = validated_data.get('name', None)
-    # del validated_data['name']
-    # print(validated_data)
     return TaskCategory.objects.create(**validated_data)
 
 
 class TaskSerializer(serializers.ModelSerializer):
-  task_id = serializers.CharField(source='id')
+  task_id = serializers.CharField(source='id', read_only=True)
+  task_name = serializers.CharField(source='name')
   project_id = serializers.CharField()
   category_id = serializers.CharField(source='category')
 
   class Meta:
     model = Task
-    fields = ['task_id',
-              'project_id',
+    fields = ['project_id',
+              'task_id',
+              'task_name',
               'category_id',
               'status',
               'description',
@@ -82,6 +66,52 @@ class TaskSerializer(serializers.ModelSerializer):
               'created_at',
               'update_at']
 
-    read_only_fields = ['task_id',
-              'project_id',
-              'category_id',]
+
+class PorjectCategorySerializer(serializers.ModelSerializer):
+  category_id = serializers.CharField(source='id', read_only=True)
+  category_name = serializers.CharField(source='name')
+
+  class Meta:
+    model = TaskCategory
+    fields = ['category_id',
+              'category_name']
+
+
+class PorjectTaskSerializer(serializers.ModelSerializer):
+  task_id = serializers.CharField(source='id', read_only=True)
+  task_name = serializers.CharField(source='name')
+  category_id = serializers.CharField(source='category')
+
+  class Meta:
+    model = Task
+    fields = ['project_id',
+              'task_id',
+              'task_name',
+              'category_id',
+              'status',
+              'description',
+              'estimate_manhour',
+              'actual_manhour',
+              'scheduled_startdate',
+              'scheduled_enddate',
+              'actual_startdate',
+              'actual_enddate',
+              'created_at',
+              'update_at']
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+  category = PorjectCategorySerializer(source='project_category', many=True, read_only=True)
+  task = PorjectTaskSerializer(source='project_task', many=True, read_only=True)
+  project_id = serializers.CharField(source='id', read_only=True)
+  project_name = serializers.CharField(source='name')
+
+  class Meta:
+    model = Project
+    fields = ['project_id',
+              'project_name',
+              'resp_user',
+              'member',
+              'description',
+              'category',
+              'task']
