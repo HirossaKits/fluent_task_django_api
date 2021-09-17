@@ -65,12 +65,24 @@ class Profile(models.Model):
       related_name='profile_user',
       on_delete=models.CASCADE
   )
-  avatar_img = models.ImageField(blank=True, null=True, upload_to=upload_avatar_path)
-  desctiption = models.CharField(null=True, blank=True, max_length=250)
+  avatar_img = models.ImageField(upload_to=upload_avatar_path)
+  desctiption = models.CharField(max_length=250)
 
   def __str__(self):
     return self.user.email
 
+
+class Project(models.Model):
+  id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+  resp = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_project', on_delete=models.CASCADE)
+  member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member')
+  name = models.CharField(max_length=50, null=False, blank=False, )
+  description = models.CharField(null=True, blank=True, max_length=250)
+
+  def __str__(self):
+    return self.name
+
+#　個人設定
 class PersonalSettings(models.Model):
 
     user = models.OneToOneField(
@@ -79,22 +91,10 @@ class PersonalSettings(models.Model):
         on_delete=models.CASCADE
     )
     dark_mode = models.BooleanField(default=False)
-    view_only_owned = models.BooleanField(default=False)
-    selected_project = models.CharField(max_length=250)
+    project = models.ForeignKey(Project, related_name='project_settins', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.user.email
-
-
-class Project(models.Model):
-  id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-  resp_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_project', on_delete=models.CASCADE)
-  member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member')
-  name = models.CharField(max_length=50, null=False, blank=False, )
-  description = models.CharField(null=True, blank=True, max_length=250)
-
-  def __str__(self):
-    return self.name
 
 
 class TaskCategory(models.Model):
