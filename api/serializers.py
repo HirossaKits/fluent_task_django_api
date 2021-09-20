@@ -39,7 +39,7 @@ class PersonalSettingsSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
   project_id = serializers.CharField(source='id', read_only=True)
   project_name = serializers.CharField(source='name')
-  # resp_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects)
+  resp_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects, source='resp')
 
   class Meta:
     model = Project
@@ -50,18 +50,17 @@ class ProjectSerializer(serializers.ModelSerializer):
               'description']
 
   def create(self, validated_data):
-      print(self)
-      print(validated_data)
-      # for item in ['設計', '製造', 'テスト']:
-      #     category = TaskCategory.objects.create(name=item)
-      #     category.save()
+      print(self.data.get('project_id'))
+      for item in ['設計', '製造', 'テスト']:
+          category = TaskCategory.objects.create(name=item)
+          category.save()
 
       member = validated_data.pop('member')
       project = Project.objects.create(**validated_data)
       for user in member:
         project.member.add(user)
 
-      print(validated_data)
+      # print(validated_data)
       # member = set()
       # for user in validated_data.get('member'):
       #     member.add(user)
@@ -73,7 +72,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-  project_id = serializers.CharField(read_only=True)
+  project_id = serializers.CharField()
   category_id = serializers.CharField(source='id', read_only=True)
   category_name = serializers.CharField(source='name')
 
@@ -82,6 +81,7 @@ class CategorySerializer(serializers.ModelSerializer):
     fields = ['project_id',
               'category_id',
               'category_name']
+
 
   def create(self, validated_data):
     return TaskCategory.objects.create(**validated_data)
