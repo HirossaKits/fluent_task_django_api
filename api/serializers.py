@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     fields = ['id', 'email', 'password', 'first_name', 'last_name']
     extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
+  # Create Profile, PersonalSettings
   def create(self, validated_data):
     user = get_user_model().objects.create_user(**validated_data)
     Token.objects.create(user=user)
@@ -23,14 +24,52 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
   class Meta:
     model = Profile
-    fields = ['avatar_img', 'desctiption']
-    #extra_kwargs = {'user': {'read_only': True}}
+    fields = ['avatar_img',
+              'desctiption']
+    extra_kwargs = {'user': {'read_only': True}}
 
 
 class PersonalSettingsSerializer(serializers.ModelSerializer):
   class Meta:
     model = PersonalSettings
-    fields = ['dark_mode', 'project']
+    fields = ['dark_mode',
+              'project']
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+  project_id = serializers.CharField(source='id', read_only=True)
+  project_name = serializers.CharField(source='name')
+  # resp_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects)
+
+  class Meta:
+    model = Project
+    fields = ['project_id',
+              'project_name',
+              'resp_id',
+              'member',
+              'description']
+
+  def create(self, validated_data):
+      print(self)
+      print(validated_data)
+      # for item in ['設計', '製造', 'テスト']:
+      #     category = TaskCategory.objects.create(name=item)
+      #     category.save()
+
+      member = validated_data.pop('member')
+      project = Project.objects.create(**validated_data)
+      for user in member:
+        project.member.add(user)
+
+      print(validated_data)
+      # member = set()
+      # for user in validated_data.get('member'):
+      #     member.add(user)
+
+      # validated_data.pop('member')
+      #
+      # project = Project.objects.create(member='member', **validated_data)
+      return project
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -72,17 +111,7 @@ class TaskSerializer(serializers.ModelSerializer):
               'update_at']
 
 
-class ProjectSerializer(serializers.ModelSerializer):
-  project_id = serializers.CharField(source='id', read_only=True)
-  project_name = serializers.CharField(source='name')
 
-  class Meta:
-    model = Project
-    fields = ['project_id',
-              'project_name',
-              'resp_id',
-              'member',
-              'description']
 
 
 # class PorjectCategorySerializer(serializers.ModelSerializer):

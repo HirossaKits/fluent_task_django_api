@@ -82,7 +82,7 @@ class Project(models.Model):
   def __str__(self):
     return self.name
 
-#　個人設定
+
 class PersonalSettings(models.Model):
 
     user = models.OneToOneField(
