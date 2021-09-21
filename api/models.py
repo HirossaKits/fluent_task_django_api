@@ -105,6 +105,14 @@ class TaskCategory(models.Model):
   )
   name = models.CharField(max_length=50, null=False, blank=False)
 
+  class Meta:
+      constraints = [
+          models.UniqueConstraint(
+              fields=['project', 'name'],
+              name='category_unique'
+          )
+      ]
+
   def __str__(self):
       return self.name
 

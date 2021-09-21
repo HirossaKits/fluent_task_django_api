@@ -50,24 +50,16 @@ class ProjectSerializer(serializers.ModelSerializer):
               'description']
 
   def create(self, validated_data):
-      print(self.data.get('project_id'))
-      for item in ['設計', '製造', 'テスト']:
-          category = TaskCategory.objects.create(name=item)
-          category.save()
 
       member = validated_data.pop('member')
       project = Project.objects.create(**validated_data)
       for user in member:
         project.member.add(user)
 
-      # print(validated_data)
-      # member = set()
-      # for user in validated_data.get('member'):
-      #     member.add(user)
-
-      # validated_data.pop('member')
-      #
-      # project = Project.objects.create(member='member', **validated_data)
+      print(project.id)
+      for item in ['設計', '製造', 'テスト']:
+          category = TaskCategory.objects.create(project_id=project.id ,name=item)
+          category.save()
       return project
 
 
@@ -81,7 +73,6 @@ class CategorySerializer(serializers.ModelSerializer):
     fields = ['project_id',
               'category_id',
               'category_name']
-
 
   def create(self, validated_data):
     return TaskCategory.objects.create(**validated_data)
