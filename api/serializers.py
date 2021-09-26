@@ -7,14 +7,17 @@ from rest_framework.authtoken.models import Token
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = get_user_model()
-    fields = ['id', 'email', 'password', 'first_name', 'last_name']
+    fields = ['id',
+              'email',
+              'password',
+              'is_active']
     extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
   # Create Profile, PersonalSettings
   def create(self, validated_data):
     user = get_user_model().objects.create_user(**validated_data)
     Token.objects.create(user=user)
-    prof = Profile.objects.create(user=user, avatar_img='null.png', desctiption='')
+    prof = Profile.objects.create(user=user, avatar_img='null.png', comment='')
     prof.save()
     settings = PersonalSettings.objects.create(user=user, dark_mode=False, project=None)
     settings.save()
@@ -24,9 +27,17 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
   class Meta:
     model = Profile
-    fields = ['avatar_img',
-              'desctiption']
+    fields = ['first_name',
+              'last_name',
+              'avatar_img',
+              'comment']
     extra_kwargs = {'user': {'read_only': True}}
+
+  # def get_first_name(self, instance):
+  #     return instance.user.first_name
+  #
+  # def get_last_name(self, instance):
+  #     return instance.user.last_name
 
 
 class PersonalSettingsSerializer(serializers.ModelSerializer):
@@ -56,40 +67,57 @@ class ProjectSerializer(serializers.ModelSerializer):
       for user in member:
         project.member.add(user)
 
-      print(project.id)
       for item in ['設計', '製造', 'テスト']:
           category = TaskCategory.objects.create(project_id=project.id ,name=item)
           category.save()
+
       return project
 
 
 class CategorySerializer(serializers.ModelSerializer):
   project_id = serializers.CharField()
+  project_name = serializers.SerializerMethodField()
   category_id = serializers.CharField(source='id', read_only=True)
   category_name = serializers.CharField(source='name')
 
   class Meta:
     model = TaskCategory
     fields = ['project_id',
+              'project_name',
               'category_id',
               'category_name']
 
   def create(self, validated_data):
     return TaskCategory.objects.create(**validated_data)
 
+  def get_project_name(self, instance):
+      return instance.project.name
+
 
 class TaskSerializer(serializers.ModelSerializer):
   task_id = serializers.CharField(source='id', read_only=True)
   task_name = serializers.CharField(source='name')
+  project_id = serializers.CharField()
+  project_name = serializers.SerializerMethodField(read_only=True)
+  category_id = serializers.CharField()
+  category_name = serializers.SerializerMethodField()
+  assigned_id = serializers.CharField()
+  assigned_name = serializers.SerializerMethodField(read_only=True)
+  author_id = serializers.CharField()
+  author_name = serializers.SerializerMethodField(read_only=True)
 
   class Meta:
     model = Task
     fields = ['task_id',
               'task_name',
               'project_id',
+              'project_name',
               'category_id',
+              'category_name',
               'assigned_id',
+              'assigned_name',
               'author_id',
+              'author_name',
               'status',
               'description',
               'estimate_manhour',
@@ -100,10 +128,22 @@ class TaskSerializer(serializers.ModelSerializer):
               'actual_enddate',
               'created_at',
               'update_at']
+    extra_kwargs = {'author_id': {'read_only': True}}
 
+  def get_project_name(self, instance):
+      return instance.project.name
 
+  def get_category_name(self, instance):
+      return instance.category.name if instance.category is not None else ''
 
+  def get_author_name(self, instance):
+      return f'{instance.author.last_name} {instance.author.first_name}' if instance.author is not None else ''
 
+  def get_assigned_name(self, instance):
+      return f'{instance.assigned.last_name} {instance.assigned.first_name}' if instance.assigned is not None else ''
+  # def create(self, validated_data):
+  #     print(validated_data)
+  #     return Task.objects.create(**validated_data)
 
 # class PorjectCategorySerializer(serializers.ModelSerializer):
 #   category_id = serializers.CharField(source='id', read_only=True)

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/React_Django_fluent_task.iml" filepath="$PROJECT_DIR$/.idea/React_Django_fluent_task.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/fluent_task_api.iml" filepath="$PROJECT_DIR$/.idea/fluent_task_api.iml" />
     </modules>
   </component>
 </project>

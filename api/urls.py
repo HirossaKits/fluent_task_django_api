@@ -12,5 +12,6 @@ router.register('task',TaskViewSet)
 urlpatterns = [
     path('user/create/', CreateUserView.as_view(), name='create'),
     path('user/login/', LoginUserView.as_view(), name='login'),
+    # path('user/update/', UpdateUserView.as_view(), name='update'),
     path('', include(router.urls)),
 ]
