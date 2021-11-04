@@ -18,6 +18,8 @@ class UserManager(BaseUserManager):
     is_active = models.BooleanField(default=True)
     # ユーザーが管理サイトへのアクセスを許可されているかどうか
     is_staff = models.BooleanField(default=False)
+    is_premium = models.BooleanField(default=False)
+    is_administrator = models.BooleanField(default=False)
 
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -38,8 +40,26 @@ def create_superuser(self, email, password):
     return user
 
 
+class Organization(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    name = models.CharField(max_length=50, default='')
+    resp = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_org', on_delete=models.CASCADE)
+    member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_org')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["member"],
+                name="lesson_unique"
+            )]
+
+    def __str__(self):
+        return self.name
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    org = models.ForeignKey(Organization, related_name='org_user', null=True, on_delete=models.SET_NULL)
     email = models.EmailField(max_length=50, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -48,7 +68,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    # Use email as username
+    # email をユーザー名として使用する
     USERNAME_FIELD = 'email'
 
     def __str__(self):
@@ -58,31 +78,29 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        related_name='profile_user',
+        related_name='user_profile',
         on_delete=models.CASCADE
     )
     first_name = models.CharField(max_length=50, default='')
     last_name = models.CharField(max_length=50, default='')
     avatar_img = models.ImageField(upload_to=upload_avatar_path, null=True)
-    comment = models.CharField(max_length=250)
+    comment = models.CharField(max_length=250, default='')
 
     def __str__(self):
         return self.user.email
 
 
-class Organization(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    resp = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_org', on_delete=models.CASCADE)
-    member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_org')
-
-
 class Project(models.Model):
     org = models.ForeignKey(Organization, related_name='project_org', on_delete=models.CASCADE)
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    resp = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_project', on_delete=models.CASCADE)
-    member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_project')
     name = models.CharField(max_length=50, null=False, blank=False, )
+    resp = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='resp_project')
+    member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_project')
     description = models.CharField(null=True, blank=True, max_length=250)
+    startdate = models.DateField(null=True, blank=True)
+    enddate = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name

@@ -6,36 +6,41 @@ from .models import Project
 
 
 class UserAdmin(BaseUserAdmin):
-  ordering = ['id']
-  list_display = ['email']
-  fieldsets = (
-      (None, {'fields': ('email', 'password')}),
-      # (_('Personal Info'), {'fields': ('first_name','last_name')}),
-      (
-          _('Permissions'),
-          {
-              'fields': (
-                  'is_active',
-                  'is_staff',
-                  'is_superuser',
-              )
-          }
-      ),
-      (_('Important dates'), {'fields': ('last_login',)}),
-  )
-  add_fieldsets = (
-      (None, {
-          'classes': ('wide',),
-          'fields': ('email', 'password1', 'password2')
-      }),
-  )
+    ordering = ['id']
+    list_display = ['email']
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        # (_('Personal Info'), {'fields': ('first_name','last_name')}),
+        (
+            _('Permissions'),
+            {
+                'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                )
+            }
+        ),
+        (_('Important dates'), {'fields': ('last_login',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2')
+        }),
+    )
+
+
+class OrganizationAdmin(admin.ModelAdmin):
+    filter_horizontal = ('member',)
 
 
 class ProjectAdmin(admin.ModelAdmin):
-  filter_horizontal = ('member',)
+    filter_horizontal = ('member',)
 
 
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Organization, OrganizationAdmin)
 admin.site.register(models.Profile)
 admin.site.register(models.Project, ProjectAdmin)
 admin.site.register(models.Task)
