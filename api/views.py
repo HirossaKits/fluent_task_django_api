@@ -4,7 +4,7 @@ from rest_framework import status, permissions, generics, viewsets
 from rest_framework.response import Response
 from .serializers import UserSerializer, ProfileSerializer, PersonalSettingsSerializer, ProjectSerializer, \
     CategorySerializer, TaskSerializer
-from api import custonpermissions
+from . import custompermissions
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -33,7 +33,7 @@ class LoginUserProfileView(viewsets.ModelViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = (permissions.IsAuthenticated, custonpermissions.ProfilePermission)
+    permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
 
     def get_queryset(self):
         projects = Project.objects.filter(member=self.request.user).prefetch_related('member')
