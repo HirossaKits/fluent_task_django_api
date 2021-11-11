@@ -31,18 +31,19 @@ class UserAdmin(BaseUserAdmin):
     )
 
 
-class OrganizationAdmin(admin.ModelAdmin):
-    filter_horizontal = ('member',)
+# class OrganizationAdmin(admin.ModelAdmin):
+#     filter_horizontal = ('member',)
 
 
 class ProjectAdmin(admin.ModelAdmin):
-    filter_horizontal = ('member',)
+    filter_horizontal = ('resp', 'member',)
 
 
 admin.site.register(models.User, UserAdmin)
-admin.site.register(models.Organization, OrganizationAdmin)
+admin.site.register(models.Organization)
 admin.site.register(models.Profile)
 admin.site.register(models.Project, ProjectAdmin)
+admin.site.register(models.PersonalSetting)
 admin.site.register(models.Task)
 admin.site.register(models.TaskCategory)
 admin.site.register(models.AlterResponsible)

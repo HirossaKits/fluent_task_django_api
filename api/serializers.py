@@ -1,4 +1,4 @@
-from api.models import Profile, Project, TaskCategory, Task, PersonalSettings
+from api.models import Profile, Project, TaskCategory, Task, PersonalSetting
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         prof.save()
 
         # PersonalSettings を作成
-        settings = PersonalSettings.objects.create(user=user, dark_mode=False, project=None)
+        settings = PersonalSetting.objects.create(user=user, dark_mode=False, project=None)
         settings.save()
         return user
 
@@ -44,32 +44,34 @@ class ProfileSerializer(serializers.ModelSerializer):
                   'last_name',
                   'avatar_img',
                   'comment']
-        extra_kwargs = {'user': {'read_only': True}}
+        # extra_kwargs = {'user': {'read_only': True}}
+
+        # def get_first_name(self, instance):
+        #     return instance.user.first_name
+
+        # def get_last_name(self, instance):
+        #     return instance.user.last_name
 
 
-# def get_first_name(self, instance):
-#     return instance.user.first_name
-
-# def get_last_name(self, instance):
-#     return instance.user.last_name
-
-
-class PersonalSettingsSerializer(serializers.ModelSerializer):
+class PersonalSettingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PersonalSettings
+        model = PersonalSetting
         fields = ['dark_mode',
-                  'project']
+                  'show_own',
+                  'project_id', ]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     project_id = serializers.CharField(source='id', read_only=True)
     project_name = serializers.CharField(source='name')
+    org_id = serializers.CharField()
     resp_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects, source='resp')
 
     class Meta:
         model = Project
         fields = ['project_id',
                   'project_name',
+                  'org_id',
                   'resp_id',
                   'member',
                   'description']

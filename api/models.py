@@ -18,8 +18,6 @@ class UserManager(BaseUserManager):
     is_active = models.BooleanField(default=True)
     # ユーザーが管理サイトへのアクセスを許可されているかどうか
     is_staff = models.BooleanField(default=False)
-    is_premium = models.BooleanField(default=False)
-    is_administrator = models.BooleanField(default=False)
 
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -31,27 +29,27 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
-def create_superuser(self, email, password):
-    user = self.create_user(email, password)
-    user.is_staff = True
-    user.is_superuser = True
-    user.save(using=self._db)
-    return user
+    def create_superuser(self, email, password):
+        user = self.create_user(email, password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+        return user
 
 
 class Organization(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     name = models.CharField(max_length=50, default='')
     resp = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_org', on_delete=models.CASCADE)
-    member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_org')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["member"],
-                name="lesson_unique"
-            )]
+    # member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_org')
+
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=["member"],
+    #             name="lesson_unique"
+    #         )]
 
     def __str__(self):
         return self.name
@@ -59,8 +57,10 @@ class Organization(models.Model):
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    org = models.ForeignKey(Organization, related_name='org_user', null=True, on_delete=models.SET_NULL)
     email = models.EmailField(max_length=50, unique=True)
+    org = models.ForeignKey(Organization, related_name='org_user', null=True, on_delete=models.SET_NULL)
+    is_premium = models.BooleanField(default=False)
+    is_administrator = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -79,7 +79,8 @@ class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         related_name='user_profile',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        primary_key=True
     )
     first_name = models.CharField(max_length=50, default='')
     last_name = models.CharField(max_length=50, default='')
@@ -91,9 +92,9 @@ class Profile(models.Model):
 
 
 class Project(models.Model):
-    org = models.ForeignKey(Organization, related_name='project_org', on_delete=models.CASCADE)
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     name = models.CharField(max_length=50, null=False, blank=False, )
+    org = models.ForeignKey(Organization, related_name='project_org', on_delete=models.CASCADE)
     resp = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='resp_project')
     member = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_project')
     description = models.CharField(null=True, blank=True, max_length=250)
@@ -106,14 +107,17 @@ class Project(models.Model):
         return self.name
 
 
-class PersonalSettings(models.Model):
+class PersonalSetting(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
-        related_name='settings_user',
-        on_delete=models.CASCADE
+        related_name='user_settings',
+        on_delete=models.CASCADE,
+        primary_key=True
     )
     dark_mode = models.BooleanField(default=False)
-    project = models.ForeignKey(Project, related_name='project_settins', on_delete=models.SET_NULL, null=True)
+    show_own = models.BooleanField(default=False)
+    project = models.ForeignKey(Project, related_name='project_settings', on_delete=models.SET_NULL, null=True,
+                                blank=True)
 
     def __str__(self):
         return self.user.email

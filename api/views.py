@@ -1,8 +1,8 @@
 from django.db.models import query
-from api.models import User, Profile, PersonalSettings, Project, Task, TaskCategory
-from rest_framework import status, permissions, generics, viewsets
+from api.models import User, Profile, PersonalSetting, Project, Task, TaskCategory
+from rest_framework import status, permissions, generics, viewsets, mixins
 from rest_framework.response import Response
-from .serializers import UserSerializer, ProfileSerializer, PersonalSettingsSerializer, ProjectSerializer, \
+from .serializers import UserSerializer, ProfileSerializer, PersonalSettingSerializer, ProjectSerializer, \
     CategorySerializer, TaskSerializer
 from . import custompermissions
 
@@ -24,9 +24,43 @@ class LoginUserView(generics.RetrieveUpdateAPIView):
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
+# class LoginUserProfileView(generics.RetrieveAPIView):
+#     queryset = Profile.objects.all()
+#     serializer_class = ProfileSerializer
+#     permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
+
+# def get_queryset(self):
+#     return self.queryset.filter(user=self.request.user)
+
+# def update(self, request, *args, **kwargs):
+#     response = {'message': 'PUT method is not allowed'}
+#     return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
 class LoginUserProfileView(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+
+# Allow only PUT
+class PersonalSettingViewSet(viewsets.ModelViewSet):
+    queryset = PersonalSetting.objects.all()
+    serializer_class = PersonalSettingSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return self.queryset
+
+    def perform_create(self, serializer):
+        response = {'message': 'POST is not allowed.'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, *args, **kwargs):
+        response = {'message': 'PATCH is not allowed.'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Allow only GET
@@ -50,24 +84,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         response = {'message': 'DELETE is not allowed.'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, *args, **kwargs):
-        response = {'message': 'PATCH is not allowed.'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-
-# Allow only PUT
-class PersonalSettingsViewSet(viewsets.ModelViewSet):
-    queryset = PersonalSettings.objects.all()
-    serializer_class = PersonalSettingsSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        response = {'message': 'POST is not allowed.'}
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
