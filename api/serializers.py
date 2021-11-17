@@ -45,24 +45,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    test = get_user_model().objects
-    # test = Profile.objects.select_related('user').get(org=self.user.org)
-    print(test)
+    user_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects, source='user')
 
     class Meta:
         model = Profile
         fields = [
+            'user_id',
             'first_name',
             'last_name',
             'avatar_img',
             'comment']
+
         # extra_kwargs = {'user': {'read_only': True}}
 
-        # def get_first_name(self, instance):
-        #     return instance.user.first_name
-
-        # def get_last_name(self, instance):
-        #     return instance.user.last_name
+    # def get_org(self, instance):
+    #     user = get_user_model().objects.filter(id=instance.user.id)
+    #     print(user)
+    #     return user.value('org')
 
 
 class PersonalSettingSerializer(serializers.ModelSerializer):

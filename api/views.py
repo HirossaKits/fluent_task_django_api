@@ -30,7 +30,20 @@ class ProfileViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
+        users = User.objects.filter(org=self.request.user.org).select_related('org')
+        return self.queryset.filter(user__in=users)
+
+    def perform_create(self, serializer):
+        response = {'message': 'POST is not allowed.'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        response = {'message': 'DELETE is not allowed.'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, *args, **kwargs):
+        response = {'message': 'PATCH is not allowed.'}
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Allow only PUT
@@ -44,34 +57,6 @@ class PersonalSettingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         response = {'message': 'POST is not allowed.'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, *args, **kwargs):
-        response = {'message': 'PATCH is not allowed.'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-
-# Allow only GET
-class NoProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-    permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
-
-    def get_queryset(self):
-        projects = Project.objects.filter(member=self.request.user).prefetch_related('member')
-        member_set = set()
-        for project in projects:
-            for id in project.member.values_list("id"):
-                member_set.add(id)
-
-        return self.queryset.filter(user__in=member_set)
-
-    def perform_create(self, serializer):
-        response = {'message': 'POST is not allowed.'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, *args, **kwargs):
-        response = {'message': 'DELETE is not allowed.'}
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
