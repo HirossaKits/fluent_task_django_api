@@ -1,3 +1,4 @@
+from datetime import datetime
 from api.models import Profile, Project, TaskCategory, Task, PersonalSetting
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -31,6 +32,12 @@ class UserSerializer(serializers.ModelSerializer):
         # PersonalSettings を作成
         settings = PersonalSetting.objects.create(user=user, dark_mode=False, project=None)
         settings.save()
+
+        # PrivateProject を作成
+        project = Project.objects.create(name='個人プロジェクト', org=None, resp=user, member=user, description='',
+                                         startdate=datetime.date.today(),
+                                         enddate=datetime.date.today().timedelta(years=1))
+
         return user
 
 
@@ -38,12 +45,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    test = get_user_model().objects
+    # test = Profile.objects.select_related('user').get(org=self.user.org)
+    print(test)
+
     class Meta:
         model = Profile
-        fields = ['first_name',
-                  'last_name',
-                  'avatar_img',
-                  'comment']
+        fields = [
+            'first_name',
+            'last_name',
+            'avatar_img',
+            'comment']
         # extra_kwargs = {'user': {'read_only': True}}
 
         # def get_first_name(self, instance):
@@ -65,7 +77,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     project_id = serializers.CharField(source='id', read_only=True)
     project_name = serializers.CharField(source='name')
     org_id = serializers.CharField()
-    resp_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects, source='resp')
+    resp_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects, many=True, source='resp')
+    member_id = serializers.PrimaryKeyRelatedField(queryset=get_user_model().objects, many=True, source='member')
 
     class Meta:
         model = Project
@@ -73,7 +86,7 @@ class ProjectSerializer(serializers.ModelSerializer):
                   'project_name',
                   'org_id',
                   'resp_id',
-                  'member',
+                  'member_id',
                   'description']
 
     def create(self, validated_data):

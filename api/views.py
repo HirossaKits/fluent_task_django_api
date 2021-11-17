@@ -24,19 +24,7 @@ class LoginUserView(generics.RetrieveUpdateAPIView):
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class LoginUserProfileView(generics.RetrieveAPIView):
-#     queryset = Profile.objects.all()
-#     serializer_class = ProfileSerializer
-#     permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
-
-# def get_queryset(self):
-#     return self.queryset.filter(user=self.request.user)
-
-# def update(self, request, *args, **kwargs):
-#     response = {'message': 'PUT method is not allowed'}
-#     return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-class LoginUserProfileView(viewsets.ModelViewSet):
+class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
@@ -64,7 +52,7 @@ class PersonalSettingViewSet(viewsets.ModelViewSet):
 
 
 # Allow only GET
-class ProfileViewSet(viewsets.ModelViewSet):
+class NoProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = (permissions.IsAuthenticated, custompermissions.ProfilePermission)
